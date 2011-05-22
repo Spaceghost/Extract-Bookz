@@ -15,7 +15,7 @@ module ExtractBookz
 		directory_count = 0
 		wriggle source do |source_dir| 
 			source_dir.directories do |dir| 
-				directory_count += 1 # Source counts as a directory
+				directory_count += 1 # Note: Source counts as a directory
 		end; end
 
 		directory_count > 1 ? extract_folder(source, target) : extract_book(source, target)
@@ -31,12 +31,12 @@ module ExtractBookz
 	end 
 
 	def self.extract_book book_dir, target
-		# Prep 
+		# Get name and create tempory directory
 		book_name = clean_name(book_dir)
 		tmp_book_dir = "#{target}/#{book_name}"
 		FileUtils.mkpath tmp_book_dir
 
-		# Go through book directory
+		# Unzip to tempory directory
 		wriggle book_dir do |book_dir_files| 
 			book_dir_files.extensions %w(zip) do |zip| 
 				`unzip -o #{zip} -d "#{tmp_book_dir}"` 
