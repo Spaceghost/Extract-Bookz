@@ -2,7 +2,6 @@ module ExtractBookz
 	require 'wriggle' # A DSL for Find
 	require 'FileUtils'
 	$delete_tmp = true
-	$delete_originals = false
 
 	def self.process source, target
 		# Sanitize
@@ -47,7 +46,6 @@ module ExtractBookz
 		`mv -f "#{tmp_book_dir}"/*.pdf "#{target}/#{book_name}.pdf"`
 
 		FileUtils.rm_rf tmp_book_dir if $delete_tmp
-		FileUtils.rm_rf book_dir if $delete_originals
 	end
 
 	def self.clean_name(book_dir)
@@ -59,12 +57,12 @@ module ExtractBookz
 		name.gsub!('.',' ') # spaces for .
 		name.gsub!('_',' ') # spaces for _
 		name.strip! # trailing/leading whitespaces
-		if book_dir[/BBL$/] then # BBL releases don't separate publisher with -
+		if book_dir = /BBL$/ || /DDU$/ then # BBL/DDU releases 
 			name.sub! /^\S*\s*/, '' # remove publisher (first word)
 			name.sub! /\s.{3}$/,'' # remove three letter month
 		end
 		return name
-		# Possible features: Keep year, keep publisher, keep edition
+		# Possible features: Heuristics, Keep year, keep publisher, keep edition
 	end 
 end 
 
