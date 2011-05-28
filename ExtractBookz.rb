@@ -1,19 +1,20 @@
 module ExtractBookz
-	require 'wriggle' # A DSL for Find
+	require 'rubygems' # Supports 1.8.7
 	require 'FileUtils'
 	$delete_tmp = true
+	require 'wriggle' # A DSL for Find
 
 	def self.process source, target
 		# Sanitize
 		source = File.expand_path(source)
 		target = File.expand_path(target)
-		raise "Source must exist" unless Dir.exists? source
-		raise "Target must exist" unless Dir.exists? target
+		raise "Source directory must exist" unless File.directory? source
+		raise "Target directory must exist" unless File.directory? target
 
 		# Is this a folder full of book directories or a single book directory?
 		directory_count = 0
 		wriggle source do |source_dir| 
-			source_dir.directories do |dir| 
+			source_dir.directories do |sub_dirs| 
 				directory_count += 1 # Note: Source counts as a directory
 		end; end
 
