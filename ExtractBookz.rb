@@ -2,7 +2,6 @@ module ExtractBookz
 	require 'rubygems' # Supports 1.8.7
 	require 'FileUtils'
 	require 'wriggle' # A DSL for Find
-	$delete_tmp = true
 
 	def self.process source, target
 		# Sanitize directory strings
@@ -59,12 +58,10 @@ module ExtractBookz
 				`unzip -o #{zip} -d "#{tmp_book_dir}"` 
 		end; end 
 
-		# Unrar, move, and rename
 		`unrar -o+ -inul e "#{tmp_book_dir}/"*.rar "#{tmp_book_dir}"`
 		`mv -f "#{tmp_book_dir}"/*.pdf "#{target}/#{book_name}.pdf"`
 		`exiftool -Title="#{book_name}" "#{target}/#{book_name}.pdf" -overwrite_original`
-
-		FileUtils.rm_rf tmp_book_dir if $delete_tmp
+		FileUtils.rm_rf tmp_book_dir
 	end
 
 	def self.clean_name(book_dir)
