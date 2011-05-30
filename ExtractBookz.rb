@@ -5,11 +5,16 @@ module ExtractBookz
 	$delete_tmp = true
 
 	def self.process source, target
-		# Sanitize
+		# Sanitize directory strings
 		source = File.expand_path(source)
 		target = File.expand_path(target)
-		raise "Source directory must exist" unless File.directory? source
-		raise "Target directory must exist" unless File.directory? target
+		# Confirm directories
+		raise "Source directory must exist!" unless File.directory? source
+		raise "Target directory must exist!" unless File.directory? target
+		# Confirm tools
+		raise "unzip must be in path!" unless which "unzip"
+		raise "unrar must be in path!" unless which "unrar"
+		raise "exiftool must be in path!" unless which "exiftool"
 
 		# Is this a folder full of book directories or a single book directory?
 		directory_count = 0
@@ -19,6 +24,18 @@ module ExtractBookz
 		end; end
 
 		directory_count > 1 ? extract_folder(source, target) : extract_book(source, target)
+	end
+
+	private
+	def self.which(cmd)
+	# Cross-platform way of finding an executable in the $PATH.
+		exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+		ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+			exts.each do |ext|
+				exe = "#{path}/#{cmd}#{ext}"
+				return exe if File.executable? exe
+		end; end
+		return nil
 	end
 
 	def self.extract_folder folder, target
@@ -42,9 +59,10 @@ module ExtractBookz
 				`unzip -o #{zip} -d "#{tmp_book_dir}"` 
 		end; end 
 
-		# Unrar, move to target and rename
+		# Unrar, move, and rename
 		`unrar -o+ -inul e "#{tmp_book_dir}/"*.rar "#{tmp_book_dir}"`
 		`mv -f "#{tmp_book_dir}"/*.pdf "#{target}/#{book_name}.pdf"`
+		`exiftool -Title="#{book_name}" "#{target}/#{book_name}.pdf" -overwrite_original`
 
 		FileUtils.rm_rf tmp_book_dir if $delete_tmp
 	end
