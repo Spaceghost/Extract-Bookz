@@ -1,8 +1,8 @@
 module ExtractBookz
 	require 'rubygems' # Supports 1.8.7
 	require 'FileUtils'
-	$delete_tmp = true
 	require 'wriggle' # A DSL for Find
+	$delete_tmp = true
 
 	def self.process source, target
 		# Sanitize
@@ -58,7 +58,7 @@ module ExtractBookz
 		name.gsub!('.',' ') # spaces for .
 		name.gsub!('_',' ') # spaces for _
 		name.strip! # trailing/leading whitespaces
-		if book_dir = /BBL$/ || /DDU$/ then # BBL/DDU releases 
+		if book_dir[/BBL$/] || book_dir[/DDU$/] then # BBL/DDU releases 
 			name.sub! /^\S*\s*/, '' # remove publisher (first word)
 			name.sub! /\s.{3}$/,'' # remove three letter month
 		end
