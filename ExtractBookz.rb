@@ -65,20 +65,18 @@ module ExtractBookz
 	end
 
 	def self.clean_name(book_dir)
-		name = book_dir.dup # Not sure why this is necessary
-		name.sub!(/\/$/,'') # remove ending / if exists
-		name.sub!(/^.*\//,'') # remove from start to last / to get directory name only
-		name.sub!(/.\d{4}.*$/,'') # from .YEAR to end
-		name.sub!(/^.*-/,'') # from beginning to -
-		name.gsub!('.',' ') # spaces for .
-		name.gsub!('_',' ') # spaces for _
-		name.strip! # trailing/leading whitespaces
-		if book_dir[/BBL$/] || book_dir[/DDU$/] then # BBL/DDU releases 
-			name.sub! /^\S*\s*/, '' # remove publisher (first word)
-			name.sub! /\s.{3}$/,'' # remove three letter month
+		clean_name = book_dir.sub(/\/$/,'') # remove ending / if exists
+		.sub(/^.*\//,'') # remove from start to last / to get directory name only
+		.sub(/.\d{4}.*$/,'') # from .YEAR to end
+		.sub(/^.*-/,'') # from beginning to -
+		.gsub('.',' ') # spaces for .
+		.gsub('_',' ') # spaces for _
+		.strip # trailing/leading whitespaces
+		if book_dir =~ /[BBL|DDU]$/ then # BBL/DDU releases 
+			clean_name = clean_name.sub(/^\S*\s*/, '') # remove publisher (first word)
+			.sub(/\s.{3}$/,'') # remove three letter month
 		end
-		return name
-		# Possible features: Heuristics, Keep year, keep publisher, keep edition
+		return clean_name
 	end 
 end 
 
